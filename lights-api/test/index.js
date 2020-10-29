@@ -55,6 +55,12 @@ describe('lights-api', () => {
                 name: 'light1',
                 type: 'Extended color light',
                 state: { reachable: true }
+            },
+            {
+                id: 5,
+                name: 'z-light5',
+                type: 'Extended color light',
+                state: { reachable: true }
             }]);
         });
     });
