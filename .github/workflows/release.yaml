@@ -32,7 +32,7 @@ jobs:
       run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
     - name: Build the tagged Docker image
-      run: docker build -f api/Dockerfile -t ${{steps.vars.outputs.image}}:${{steps.vars.outputs.tag}}
+      run: docker build api -t ${{steps.vars.outputs.image}}:${{steps.vars.outputs.tag}}
 
     - name: Push the tagged Docker image
       run: docker push ${{steps.vars.outputs.image}}:${{steps.vars.outputs.tag}}
