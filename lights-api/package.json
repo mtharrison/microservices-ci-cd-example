@@ -1,0 +1,21 @@
+{
+  "name": "@mtharrison/lights-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --trace-warnings ./node_modules/.bin/lab -a @hapi/code -t 100 -L -v -p 1 -m 5000"
+  },
+  "keywords": [],
+  "author": "Matt Harrison <hi@matt-harrison.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@hapi/code": "^8.0.2",
+    "@hapi/hapi": "^20.0.1",
+    "@hapi/lab": "^24.1.0",
+    "node-hue-api": "^4.0.9"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  }
+}
