@@ -7,11 +7,15 @@ const Lights = require('./lights');
 
 exports.start = async (api) => {
 
-    const server = Hapi.server({ port: process.env.PORT || 8000 });
+    const server = Hapi.server({
+        port: process.env.PORT || 8000,
+        routes: { cors: true }
+    });
 
     server.route({
         method: 'GET',
         path: '/',
+        options: { cors: true },
         handler: (request, h) => {
 
             return Lights.getLights(api);
@@ -21,6 +25,7 @@ exports.start = async (api) => {
     server.route({
         method: 'PATCH',
         path: '/{id}',
+        options: { cors: true },
         handler: (request, h) => {
 
             const id = request.params.id;

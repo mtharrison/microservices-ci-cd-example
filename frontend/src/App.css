@@ -1,5 +1,26 @@
-.App {
+body {
+  background-color: #282c34;
+}
+
+h1 {
+  color: #fff;
+  font-family: 'Fredoka One', cursive;
+  font-weight: normal;
+  font-size: 50pt;
   text-align: center;
+}
+
+h3 {
+  font-family: 'Fredoka One', cursive;
+  font-weight: normal;
+  font-size: 15pt;
+  text-align: center;
+  margin-top: 5px;
+}
+
+.App {
+  width: 80%;
+  margin: auto;
 }
 
 .App-logo {
@@ -35,4 +56,35 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+
+.lights-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.light {
+  background: #191b1d;
+  margin: 10px;
+  padding: 10px;
+  color: #fff;
+  border-radius: 10px;
+}
+
+.light-control {
+  overflow: hidden;
+}
+
+.light-control > * {
+  float: left;
+}
+
+.light-control label {
+  margin-top: 10px;
+}
+
+.sketch-picker {
+  margin: auto;
 }
