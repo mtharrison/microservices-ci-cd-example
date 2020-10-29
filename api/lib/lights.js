@@ -11,7 +11,7 @@ exports.getLights = async (api) => {
         state: light.state
     })).filter((light) => {
 
-        return light.type === 'Extended color light' && light.state.reachable === true;
+        return light.name.toLowerCase().includes('office') && light.type === 'Extended color light' && light.state.reachable === true;
     }).sort((a, b) => {
 
         return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;

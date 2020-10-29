@@ -1,49 +1,82 @@
+import _ from 'lodash'
+import React from 'react'
 import Switch from '@material-ui/core/Switch';
 import Slider from '@material-ui/core/Slider';
-import { SketchPicker } from 'react-color';
+import { HuePicker } from 'react-color';
 
 import * as ColorConversion from './color-conversion'
 
-function Light({ light }) {
+class Light extends React.Component {
 
-  const { id, name, state } = light;
-  const { xy, bri, on } = state;
+  constructor(props) {
+    super(props);
 
-  return (
-    <div className="light" key={id}>
-        <h3 className="light-name">💡 {name}</h3>
+    const { light } = props
+    const { state } = light;
+    const { xy, bri } = state;
 
-        <div className="light-control">
-        <Switch
-          checked={on === true}
-          onChange={() => {}}
-          name={name}
-          color="primary"
-        />
-        <label>Light: {on === true ? 'On' : 'Off'}</label>
-        </div>
+    this.state = {
+      rgb: ColorConversion.cie_to_rgb(xy[0], xy[1], bri) };
+  }
 
-        <p>Brightness: {bri}</p>
+  componentWillReceiveProps(nextProps) {
 
-        <Slider
-          defaultValue={bri}
-          getAriaValueText={() => name}
-          aria-labelledby="discrete-slider"
-          valueLabelDisplay="auto"
-          step={10}
-          marks
-          min={0}
-          max={254}
-        />
+    const { light } = nextProps
+    const { state } = light;
+    const { xy, bri } = state;
+    this.setState({ rgb: ColorConversion.cie_to_rgb(xy[0], xy[1], bri) });
+  }
 
-        <p></p>
+  render() {
 
-        <SketchPicker
-          color={ ColorConversion.cie_to_rgb(xy[0], xy[1], bri) }
-        />
+    const { light, onStateChange } = this.props
+    const { id, name, state } = light;
+    const { xy, bri, on } = state;
 
-    </div>
-  );
+    const throttledOnStateChange = _.debounce(onStateChange, 200);
+
+    return (
+      <div className="light" key={id}>
+          <h3 className="light-name">💡 {name}</h3>
+
+          <div className="light-control">
+          <Switch
+            checked={on === true}
+            onChange={() => { onStateChange(id, { on: !on }) }}
+            name={name}
+            color="primary"
+          />
+          <label>Light: {on === true ? 'On' : 'Off'}</label>
+          </div>
+
+          <p>Brightness: {bri}</p>
+
+          <Slider
+            value={bri}
+            getAriaValueText={() => name}
+            aria-labelledby="discrete-slider"
+            valueLabelDisplay="auto"
+            onChange={(ev, value) => { throttledOnStateChange(id, { bri: value }) }}
+            step={10}
+            marks
+            min={0}
+            max={254}
+          />
+
+          <p></p>
+
+          <HuePicker
+            color={ this.state.rgb }
+            onChange={ (val) => this.setState({ rgb: val.rgb }) }
+            onChangeComplete={ (val) => {
+              this.setState({ rgb: val.rgb })
+              onStateChange(id, { xy: ColorConversion.rgb_to_cie(val.rgb.r, val.rgb.g, val.rgb.b) })
+            } }
+          />
+
+      </div>
+    );
+  }
 }
 
 export default Light;

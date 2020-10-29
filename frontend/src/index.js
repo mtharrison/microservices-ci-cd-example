@@ -13,7 +13,9 @@ const fetchLights = async () => {
 
 const onStateChange = async (id, state) => {
 
-  console.log(id, state);
+  console.log(state);
+  const res = await Axios.patch(`http://localhost:8000/${id}`, { state });
+  console.log(res.data);
 };
 
 const main = async () => {
@@ -27,5 +29,7 @@ const main = async () => {
     document.getElementById('root')
   );
 }
+
+// setInterval(() => main(), 5000);
 
 main();
