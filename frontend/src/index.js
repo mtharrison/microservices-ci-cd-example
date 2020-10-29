@@ -5,16 +5,18 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 
+const API_URL = document.location.href.includes('localhost') ? 'http://localhost:8000' : '/api'
+
 const fetchLights = async () => {
 
-  const res = await Axios.get('http://localhost:8000');
+  const res = await Axios.get(`${API_URL}`);
   return res.data;
 };
 
 const onStateChange = async (id, state) => {
 
   console.log(state);
-  const res = await Axios.patch(`http://localhost:8000/${id}`, { state });
+  const res = await Axios.patch(`${API_URL}/${id}`, { state });
   console.log(res.data);
 };
 
@@ -30,6 +32,6 @@ const main = async () => {
   );
 }
 
-// setInterval(() => main(), 5000);
+setInterval(() => main(), 5000);
 
 main();
