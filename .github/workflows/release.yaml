@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v2-beta
       with:
@@ -24,24 +23,13 @@ jobs:
       id: vars
       run: |
         echo ::set-output name=tag::$(echo ${GITHUB_REF#refs/*/})
-        echo ::set-output name=image::mtharrison/github-pr-comment-resource
+        echo ::set-output name=image::mtharrison/microservices-ci-cd-example-api
 
     - name: Login to DockerHub
       run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
     - name: Build the tagged Docker image
-      run: docker build . -t ${{steps.vars.outputs.image}}:${{steps.vars.outputs.tag}}
+      run: docker build -f api/Dockerfile -t ${{steps.vars.outputs.image}}:${{steps.vars.outputs.tag}}
 
     - name: Push the tagged Docker image
       run: docker push ${{steps.vars.outputs.image}}:${{steps.vars.outputs.tag}}
-
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
