@@ -4,7 +4,7 @@ import Switch from '@material-ui/core/Switch';
 import Slider from '@material-ui/core/Slider';
 import { SketchPicker } from 'react-color';
 
-
+import * as ColorConversion from './color-conversion'
 
 
 function App({ lights }) {
@@ -19,7 +19,7 @@ function App({ lights }) {
           <Switch
             checked={light.state.on === true}
             onChange={() => {}}
-            name="checkedB"
+            name={light.id}
             color="primary"
           />
           <label>Light: {light.state.on === true ? 'On' : 'Off'}</label>
@@ -40,7 +40,9 @@ function App({ lights }) {
 
         <p></p>
 
-        <SketchPicker />
+        <SketchPicker
+          color={ ColorConversion.cie_to_rgb(light.state.xy[0], light.state.xy[1], light.state.bri) }
+        />
 
       </div>
     );
