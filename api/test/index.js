@@ -19,11 +19,11 @@ describe('lights-api', () => {
     beforeEach(() => {
 
         const lights = [
-            { id: 1, name: 'light1', type: 'Extended color light', state: { reachable: true } },
             { id: 2, name: 'light2', type: 'Extended color light', state: { reachable: false } },
-            { id: 3, name: 'light3', type: 'Another light', state: { reachable: true } },
-            { id: 4, name: 'a-light4', type: 'Extended color light', state: { reachable: true } },
-            { id: 5, name: 'z-light5', type: 'Extended color light', state: { reachable: true } }
+            { id: 3, name: 'office-light3', type: 'Another light', state: { reachable: true } },
+            { id: 4, name: 'a-office-light4', type: 'Extended color light', state: { reachable: true } },
+            { id: 1, name: 'office-light1', type: 'Extended color light', state: { reachable: true } },
+            { id: 5, name: 'z-office-light5', type: 'Extended color light', state: { reachable: true } }
         ];
 
         api = {
@@ -46,19 +46,19 @@ describe('lights-api', () => {
 
             expect(lights).to.equal([{
                 id: 4,
-                name: 'a-light4',
+                name: 'a-office-light4',
                 type: 'Extended color light',
                 state: { reachable: true }
             },
             {
                 id: 1,
-                name: 'light1',
+                name: 'office-light1',
                 type: 'Extended color light',
                 state: { reachable: true }
             },
             {
                 id: 5,
-                name: 'z-light5',
+                name: 'z-office-light5',
                 type: 'Extended color light',
                 state: { reachable: true }
             }]);

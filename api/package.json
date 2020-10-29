@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node lib/index.js",
-    "test": "node --trace-warnings ./node_modules/.bin/lab -a @hapi/code -t 100 -L -v -p 1 -m 5000"
+    "test": "node --trace-warnings ./node_modules/.bin/lab -a @hapi/code -t 90 -L -v -p 1 -m 5000"
   },
   "keywords": [],
   "author": "Matt Harrison <hi@matt-harrison.com>",
