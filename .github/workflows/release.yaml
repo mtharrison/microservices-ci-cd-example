@@ -1,4 +1,4 @@
-name: release
+name: Release and Deploy
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   release-api:
-    name: release-api
+    name: Release API
     runs-on: ubuntu-latest
     steps:
 
@@ -35,10 +35,18 @@ jobs:
       run: docker build api -t ${{steps.vars.outputs.image}}:${{steps.vars.outputs.tag}}
 
     - name: Push the tagged Docker image
-      run: docker push ${{steps.vars.outputs.image}}:${{steps.vars.outputs.tag}}
+      run: |
+        docker push ${{steps.vars.outputs.image}}:${{steps.vars.outputs.tag}}
+        echo "${{steps.vars.outputs.tag}}" > version.txt
+
+    - name: Store the version as an artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: version
+        path: version.txt
 
   release-frontend:
-    name: release-frontend
+    name: Release Frontend
     runs-on: ubuntu-latest
     steps:
 
@@ -61,3 +69,39 @@ jobs:
 
     - name: Push the tagged Docker image
       run: docker push ${{steps.vars.outputs.image}}:${{steps.vars.outputs.tag}}
+
+  deploy:
+    name: Deploy Helm Chart
+    needs: [release-api, release-frontend]
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v1
+
+    - name: Download version number
+      uses: actions/download-artifact@v2
+      with:
+        name: version
+
+    - name: Set some variables
+      id: vars
+      run: |
+        echo ::set-output name=tag::$(cat version.txt)
+
+    - name: deploy
+      uses: 'deliverybot/helm@v1'
+      with:
+        release: 'microservices'
+        namespace: 'default'
+        chart: 'helm'
+        helm: 'helm3'
+        token: '${{ github.token }}'
+        values: |
+          imageVersion: ${{ steps.vars.outputs.tag }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+          HUE_USERNAME: ${{ secrets.HUE_USERNAME }}
+      env:
+        KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
