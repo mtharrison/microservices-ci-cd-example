@@ -1,0 +1,14 @@
+apiVersion: v2
+name: microservices-ci-cd-example
+description: A Microservices ci/cd example
+
+type: application
+
+version: 0.1.0
+
+appVersion: 1.16.0
+
+dependencies:
+- name: ingress-nginx
+  version: 3.7.1
+  repository: https://kubernetes.github.io/ingress-nginx
