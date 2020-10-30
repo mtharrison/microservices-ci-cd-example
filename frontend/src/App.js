@@ -22,15 +22,22 @@ class App extends React.Component {
   lightStateChange(id, state) {
 
     const newLights = _.cloneDeep(this.state.lights);
-    Object.assign(newLights.find((light) => light.id === id).state, state);
-    this.setState({ lights: newLights });
+    debugger;
 
+    for (const room in newLights) {
+      const light = newLights[room].lights.find((light) => light.id === id);
+      if (light) {
+        Object.assign(light.state, state);
+      }
+    }
+
+    this.setState({ lights: newLights });
     this.props.onStateChange(id, state);
   }
 
   render() {
 
-    const lightComponents = this.state.lights.map((light) => {
+    const lightComponents = (lights) => lights.map((light) => {
 
       return (
         <Light key={light.id} light={light} onStateChange={this.lightStateChange.bind(this)}/>
@@ -42,9 +49,18 @@ class App extends React.Component {
 
         <h1>🏠💡 Control Matt's Lights 💡🏠</h1>
 
-        <div className="lights-container">
-          {lightComponents}
-        </div>
+        {Object.entries(this.state.lights).map(([name, room]) => {
+
+          return (
+            <div key={name}>
+              <h2>🚪 {name}</h2>
+              <div className="lights-container">
+              {lightComponents(room.lights)}
+              </div>
+            </div>
+          );
+
+        })}
 
       </div>
     );
