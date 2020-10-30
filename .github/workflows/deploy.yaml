@@ -16,6 +16,7 @@ jobs:
         release: 'microservices'
         namespace: 'default'
         chart: 'helm'
+        helm: 'helm3'
         token: '${{ github.token }}'
         values: |
           imageVersion: v0.1.4
