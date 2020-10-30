@@ -1,4 +1,4 @@
-name: Release and Deploy
+name: Build, Release and Deploy
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   release-api:
-    name: Release API
+    name: Build and Release API
     runs-on: ubuntu-latest
     steps:
 
@@ -39,14 +39,8 @@ jobs:
         docker push ${{steps.vars.outputs.image}}:${{steps.vars.outputs.tag}}
         echo "${{steps.vars.outputs.tag}}" > version.txt
 
-    - name: Store the version as an artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: version
-        path: version.txt
-
   release-frontend:
-    name: Release Frontend
+    name: Build and Release Frontend
     runs-on: ubuntu-latest
     steps:
 
@@ -71,22 +65,17 @@ jobs:
       run: docker push ${{steps.vars.outputs.image}}:${{steps.vars.outputs.tag}}
 
   deploy:
-    name: Deploy Helm Chart
+    name: Deploy Helm Chart to Kubernetes
     needs: [release-api, release-frontend]
     runs-on: ubuntu-latest
     steps:
 
     - uses: actions/checkout@v1
 
-    - name: Download version number
-      uses: actions/download-artifact@v2
-      with:
-        name: version
-
     - name: Set some variables
       id: vars
       run: |
-        echo ::set-output name=tag::$(cat version.txt)
+        echo ::set-output name=tag::$(echo ${GITHUB_REF#refs/*/})
 
     - name: deploy
       uses: 'deliverybot/helm@v1'
