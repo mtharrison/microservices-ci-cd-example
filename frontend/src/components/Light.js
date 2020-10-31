@@ -8,14 +8,21 @@ import { HuePicker } from 'react-color';
 import * as ColorConversion from '../helpers/color-conversion'
 
 
-const Light = ({ light }) => {
+const Light = ({ light, lights }) => {
 
-    const { id, name, state } = light;
+    if (!lights[light]) {
+        return null;
+    }
+
+    const { name, state, type } = lights[light];
     const { xy, bri, on } = state;
-    const [x, y] = xy;
+    
+    const picker = xy ? <HuePicker
+        color={ ColorConversion.cie_to_rgb(xy[0], xy[0], bri) }
+    /> : null;
 
     return (
-        <div className="light" key={id}>
+        <div className="light" key={name}>
         <h3 className="light-name">💡 {name}</h3>
 
         <div className="light-control">
@@ -44,15 +51,13 @@ const Light = ({ light }) => {
 
         <p></p>
 
-        <HuePicker
-            color={ ColorConversion.cie_to_rgb(x, y, bri) }
-        />
+        {picker}
 
         </div>
     );
 }
 
 export default connect(
-    null,
+    (state) => ({ lights: state.lights }),
     null
 )(Light);

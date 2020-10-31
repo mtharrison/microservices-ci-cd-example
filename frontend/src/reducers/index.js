@@ -1,7 +1,6 @@
 import * as ActionTypes from '../actions'
-import { combineReducers } from 'redux'
 
-const lights = (state = {}, action) => {
+const rootReducer = (state = { rooms: {}, lights: {} }, action) => {
 
     switch(action.type) {
     case ActionTypes.API_DATA_RECEIVED:
@@ -10,9 +9,5 @@ const lights = (state = {}, action) => {
         return state
     }
 };
-
-const rootReducer = combineReducers({
-    lights
-});
 
 export default rootReducer;

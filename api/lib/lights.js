@@ -5,36 +5,36 @@ exports.getLights = async (api) => {
     const roomsRes = await api.groups.getRooms();
     const lightsRes = await api.lights.getAll();
 
-    const lights = lightsRes.map((light) => ({
-        id: light.id,
-        name: light.name,
-        type: light.type,
-        state: light.state
-    })).filter((light) => {
+    const lights = lightsRes.reduce((acc, light) => {
 
-        return light.type === 'Extended color light' && light.state.reachable === true;
-    }).sort((a, b) => {
-
-        return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
-    });
-
-    const rooms = roomsRes.reduce((acc, curr) => {
-
-        const roomLights = lights.filter(({ id }) => curr.lights.includes(String(id)));
-
-        if (roomLights.length === 0) {
+        if (light.state.reachable !== true) {
             return acc;
         }
 
-        acc[curr.name] = {
-            name: curr.name,
-            lights: roomLights
+        acc[light.id] = {
+            name: light.name,
+            type: light.type,
+            state: light.state
         };
 
         return acc;
     }, {});
 
-    return rooms;
+    const rooms = roomsRes.reduce((acc, room) => {
+
+        if (room.lights.length === 0) {
+            return acc;
+        }
+
+        acc[room.name] = {
+            name: room.name,
+            lights: room.lights
+        };
+
+        return acc;
+    }, {});
+
+    return { rooms, lights };
 };
 
 exports.setLightState = async (api, id, state) => {
