@@ -43,7 +43,7 @@ exports.start = async (api) => {
             // Exchange access code for access token
 
             const code = request.query.code;
-            const res = await Wreck.post(`https://github.com/login/oauth/access_token?client_id=${process.env.GITHUB_AUTH_CLIENT_ID}&client_secret=${process.env.GITHUB_AUTH_CLIENT_SECRET}&code=${code}`, {
+            const res = await Wreck.post(`https://github.com/login/oauth/access_token?client_id=${process.env.GH_CLIENT_ID}&client_secret=${process.env.GH_CLIENT_SECRET}&code=${code}`, {
                 headers: {
                     accept: 'application/json'
                 },

@@ -92,5 +92,10 @@ jobs:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
           HUE_USERNAME: ${{ secrets.HUE_USERNAME }}
+
+          GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
+          GH_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
+          ALLOWED_USERS: ${{ secrets.ALLOWED_USERS }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
       env:
         KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
