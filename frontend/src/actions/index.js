@@ -61,8 +61,6 @@ export const stateUpdating = (data) => ({
 export const loggedIn = () => async (dispatch) => {
 
     dispatch(loadApiData());
-    setInterval(() => dispatch(loadApiData()), 1000);
-
     dispatch({ type: LOGGED_IN });
 };
 

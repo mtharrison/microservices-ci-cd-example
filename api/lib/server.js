@@ -15,13 +15,6 @@ exports.start = async (api) => {
         routes: { cors: true }
     });
 
-    let lightData = Lights.getLights(api);
-
-    setInterval(() => {
-
-        lightData = Lights.getLights(api)
-    }, 1000);
-
     server.route({
         method: 'GET',
         path: '/',
@@ -30,7 +23,7 @@ exports.start = async (api) => {
 
             Jwt.verify(request.query.token, process.env.JWT_SECRET);
 
-            return lightData;
+            return Lights.getLights(api);
         }
     });
 
