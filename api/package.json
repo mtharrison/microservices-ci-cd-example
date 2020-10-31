@@ -11,9 +11,12 @@
   "author": "Matt Harrison <hi@matt-harrison.com>",
   "license": "MIT",
   "dependencies": {
+    "@hapi/bell": "^12.1.1",
     "@hapi/code": "^8.0.2",
     "@hapi/hapi": "^20.0.1",
     "@hapi/lab": "^24.1.0",
+    "@hapi/wreck": "^17.0.0",
+    "jsonwebtoken": "^8.5.1",
     "node-hue-api": "^4.0.9"
   },
   "devDependencies": {

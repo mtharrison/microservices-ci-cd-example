@@ -99,3 +99,11 @@ h3 {
 .sketch-picker {
   margin: auto;
 }
+
+#github-button {
+  width: 400px;
+  margin: auto;
+  top: 100px;
+  background-color: #fff;
+  color: black;
+}

@@ -1,6 +1,8 @@
 'use strict';
 
 const Hapi = require('@hapi/hapi');
+const Jwt = require('jsonwebtoken');
+const Wreck = require('@hapi/wreck');
 
 const Lights = require('./lights');
 
@@ -27,6 +29,43 @@ exports.start = async (api) => {
         handler: (request, h) => {
 
             return lightData;
+        }
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/login',
+        options: { cors: true },
+        handler: async (request, h) => {
+
+            // Exchange access code for access token
+
+            const code = request.query.code;
+            const res = await Wreck.post(`https://github.com/login/oauth/access_token?client_id=${process.env.GITHUB_AUTH_CLIENT_ID}&client_secret=${process.env.GITHUB_AUTH_CLIENT_SECRET}&code=${code}`, {
+                headers: {
+                    accept: 'application/json'
+                },
+                json: true
+            });
+            
+            const { access_token } = res.payload;
+
+            // Find out who the user is
+
+            const { payload } = await Wreck.get('https://api.github.com/user', {
+                headers: {
+                    'User-Agent': 'Control Matt\'s Lights',
+                    authorization: `token ${access_token}`
+                },
+                json: true
+            });
+
+            if (process.env.ALLOWED_USERS.split(',').includes(payload.login)) {
+                const token = Jwt.sign({ user: payload.login }, process.env.JWT_SECRET);
+                return { token };
+            }
+
+            return {};
         }
     });
 
