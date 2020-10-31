@@ -1,37 +1,43 @@
-import Axios from 'axios';
+import './styles/index.css';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux'
 
-import './index.css';
-import App from './App';
+import { loadApiData } from './actions'
+import App from './components/App';
+import configureStore from './store/configure-store'
 
-const API_URL = document.location.href.includes('localhost') ? 'http://localhost:8000' : '/api'
 
-const fetchLights = async () => {
+const store = configureStore()
 
-  const res = await Axios.get(`${API_URL}`);
-  return res.data;
-};
+// const API_URL = document.location.href.includes('localhost') ? 'http://localhost:8000' : '/api'
 
-const onStateChange = async (id, state) => {
+// const fetchLights = async () => {
 
-  console.log(state);
-  const res = await Axios.patch(`${API_URL}/${id}`, { state });
-  console.log(res.data);
-};
+//   const res = await Axios.get(`${API_URL}`);
+//   return res.data;
+// };
 
-const main = async () => {
+// const onStateChange = async (id, state) => {
 
-  const lights = await fetchLights();
+//   console.log(state);
+//   const res = await Axios.patch(`${API_URL}/${id}`, { state });
+//   console.log(res.data);
+// };
 
-  ReactDOM.render(
-    <React.StrictMode>
-      <App lights={lights} onStateChange={onStateChange}/>
-    </React.StrictMode>,
-    document.getElementById('root')
-  );
+const render = async () => {
+
+    ReactDOM.render(
+        <Provider store={store}>
+            <App />
+        </Provider>,
+        document.getElementById('root')
+    );
 }
 
-setInterval(() => main(), 5000);
+render();
 
-main();
+// Start the state flowing
+
+store.dispatch(loadApiData())
