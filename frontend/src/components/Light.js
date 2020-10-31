@@ -1,24 +1,27 @@
 import { connect } from 'react-redux'
-import React from 'react'
+import { React, useState } from 'react'
 
 import Switch from '@material-ui/core/Switch';
 import Slider from '@material-ui/core/Slider';
 import { HuePicker } from 'react-color';
 
+import { updateState } from '../actions'
 import * as ColorConversion from '../helpers/color-conversion'
 
 
-const Light = ({ light, lights }) => {
-
-    if (!lights[light]) {
-        return null;
-    }
+const Light = ({ light, lights, updateState }) => {
 
     const { name, state, type } = lights[light];
     const { xy, bri, on } = state;
+
+    const [onState, updateOnState] = useState(on);
+    const [briState, updateBriState] = useState(bri);
+    const [rgbState, updateRgbState] = useState(ColorConversion.cie_to_rgb(xy ? xy[0] : 0, xy ? xy[0] : 0, bri));
     
     const picker = xy ? <HuePicker
-        color={ ColorConversion.cie_to_rgb(xy[0], xy[0], bri) }
+        color={rgbState}
+        onChange={(rgb) => updateRgbState(rgb)}
+        onChangeComplete={({ rgb }) => updateState(light, { xy: ColorConversion.rgb_to_cie(rgb.r, rgb.g, rgb.b) })}
     /> : null;
 
     return (
@@ -26,23 +29,27 @@ const Light = ({ light, lights }) => {
         <h3 className="light-name">💡 {name}</h3>
 
         <div className="light-control">
-        <Switch
-            checked={on === true}
-            onChange={() => {}}
-            name={name}
-            color="primary"
-        />
-        <label>Light: {on === true ? 'On' : 'Off'}</label>
+            <Switch
+                checked={onState}
+                onChange={() => {
+                    updateOnState(!onState);;
+                    updateState(light, { on: !onState });
+                }}
+                name={name}
+                color="primary"
+            />
+            <label>Light: {onState === true ? 'On' : 'Off'}</label>
         </div>
 
-        <p>Brightness: {bri}</p>
+        <p>Brightness: {briState}</p>
 
         <Slider
-            value={bri}
+            value={briState}
             getAriaValueText={() => name}
             aria-labelledby="discrete-slider"
             valueLabelDisplay="auto"
-            onChange={(ev, value) => { }}
+            onChange={(_, value) => updateBriState(value)}
+            onChangeCommitted={(_, value) => updateState(light, { bri: briState })}
             step={10}
             marks
             min={0}
@@ -59,5 +66,7 @@ const Light = ({ light, lights }) => {
 
 export default connect(
     (state) => ({ lights: state.lights }),
-    null
+    (dispatch) => ({
+        updateState: (id, state) => dispatch(updateState(id, state))
+    })
 )(Light);

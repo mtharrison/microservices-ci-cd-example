@@ -12,13 +12,20 @@ exports.start = async (api) => {
         routes: { cors: true }
     });
 
+    let lightData = Lights.getLights(api);
+
+    setInterval(() => {
+
+        lightData = Lights.getLights(api)
+    }, 1000);
+
     server.route({
         method: 'GET',
         path: '/',
         options: { cors: true },
         handler: (request, h) => {
 
-            return Lights.getLights(api);
+            return lightData;
         }
     });
 
