@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import { React, useState } from 'react'
+import { React, useState, useEffect } from 'react'
 
 import Switch from '@material-ui/core/Switch';
 import Slider from '@material-ui/core/Slider';
@@ -16,7 +16,15 @@ const Light = ({ light, lights, updateState }) => {
 
     const [onState, updateOnState] = useState(on);
     const [briState, updateBriState] = useState(bri);
-    const [rgbState, updateRgbState] = useState(ColorConversion.cie_to_rgb(xy ? xy[0] : 0, xy ? xy[0] : 0, bri));
+    const [rgbState, updateRgbState] = useState(ColorConversion.cie_to_rgb(xy ? xy[0] : 0, xy ? xy[1] : 0, bri));
+
+    useEffect(() => {
+        
+        updateOnState(on)
+        updateBriState(bri)
+        updateRgbState(ColorConversion.cie_to_rgb(xy ? xy[0] : 0, xy ? xy[1] : 0, bri))
+
+    }, [state]);
     
     const picker = xy ? <HuePicker
         color={rgbState}
