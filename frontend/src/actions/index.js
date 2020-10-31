@@ -6,7 +6,11 @@ export const UPDATE_STATE = 'UPDATE_STATE';
 export const STATE_UPDATING = 'STATE_UPDATING';
 export const STATE_UPDATED = 'STATE_UPDATED';
 
-const API_URL = document.location.href.includes('localhost') ? 'http://localhost:8000' : '/api'
+let API_URL = '/api';
+
+if (document.location.href.includes('localhost') || document.location.href.includes('192.168')) {
+    API_URL = `http://${document.location.hostname}:8000`;
+}
 
 export const loadApiData = () => async (dispatch, getState) => {
 
@@ -45,6 +49,6 @@ export const stateUpdating = (data) => ({
 export const updateState = (id, state) => async (dispatch) => {
 
     dispatch(stateUpdating());
-    const res = await Axios.patch(`${API_URL}/${id}`, { state });
+    await Axios.patch(`${API_URL}/${id}`, { state });
     dispatch(stateUpdated());
 };

@@ -11,7 +11,7 @@ import * as ColorConversion from '../helpers/color-conversion'
 
 const Light = ({ light, lights, updateState }) => {
 
-    const { name, state, type } = lights[light];
+    const { name, state } = lights[light];
     const { xy, bri, on } = state;
 
     const [onState, updateOnState] = useState(on);
@@ -19,12 +19,10 @@ const Light = ({ light, lights, updateState }) => {
     const [rgbState, updateRgbState] = useState(ColorConversion.cie_to_rgb(xy ? xy[0] : 0, xy ? xy[1] : 0, bri));
 
     useEffect(() => {
-        
         updateOnState(on)
         updateBriState(bri)
         updateRgbState(ColorConversion.cie_to_rgb(xy ? xy[0] : 0, xy ? xy[1] : 0, bri))
-
-    }, [state]);
+    }, [on, bri, xy]);
     
     const picker = xy ? <HuePicker
         color={rgbState}
