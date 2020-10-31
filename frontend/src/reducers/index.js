@@ -9,6 +9,8 @@ const rootReducer = (state = { rooms: {}, lights: {}, updating: false, loggedIn:
         return { ...state, updating: true };
     case ActionTypes.STATE_UPDATED:
         return { ...state, updating: false };
+    case ActionTypes.LOGGED_IN:
+        return { ...state, loggedIn: true };
     default:
         return state
     }

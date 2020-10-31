@@ -28,6 +28,8 @@ exports.start = async (api) => {
         options: { cors: true },
         handler: (request, h) => {
 
+            Jwt.verify(request.query.token, process.env.JWT_SECRET);
+
             return lightData;
         }
     });
@@ -74,6 +76,8 @@ exports.start = async (api) => {
         path: '/{id}',
         options: { cors: true },
         handler: (request, h) => {
+
+            Jwt.verify(request.query.token, process.env.JWT_SECRET);
 
             const id = request.params.id;
             const { state } = request.payload;
