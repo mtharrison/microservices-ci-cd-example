@@ -28,15 +28,6 @@ spec:
           value: "{{ .Values.REFRESH_TOKEN }}"
         - name: HUE_USERNAME
           value: "{{ .Values.HUE_USERNAME }}"
-
-        - name: GH_CLIENT_ID
-          value: "{{ .Values.GH_CLIENT_ID }}"
-        - name: GH_CLIENT_SECRET
-          value: "{{ .Values.GH_CLIENT_SECRET }}"
-        - name: ALLOWED_USERS
-          value: "{{ .Values.ALLOWED_USERS }}"
-        - name: JWT_SECRET
-          value: "{{ .Values.JWT_SECRET }}"
 ---
 apiVersion: v1
 kind: Service
