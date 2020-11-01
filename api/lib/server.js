@@ -66,10 +66,6 @@ exports.start = async (api) => {
             const token = request.headers.authorization.split(' ')[1];
             const decoded = await jwtVerify(token, getKey);
 
-            if (!decoded.permissions.includes('read:lights')) {
-                throw new Error('Need permissions to read lights');
-            }
-
             return lightState;
         }
     });
