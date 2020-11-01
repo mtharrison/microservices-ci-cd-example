@@ -107,3 +107,25 @@ h3 {
   background-color: #fff;
   color: black;
 }
+
+header {
+  overflow: hidden;
+}
+
+header h1 {
+  float: left;
+  margin-bottom: 60px;
+}
+
+header .login-component {
+  float: right;
+  color: #ffffff;
+  font-size: 20px;
+  margin-top: 10px;
+}
+
+
+header button {
+  margin-left: 10px;
+  color: #191b1d;
+}

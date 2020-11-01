@@ -3,12 +3,26 @@
 const Hapi = require('@hapi/hapi');
 const Hoek = require('@hapi/hoek');
 const Jwt = require('jsonwebtoken');
-const Wreck = require('@hapi/wreck');
+const Jwks = require('jwks-rsa');
+const Util = require('util');
+
 
 const Lights = require('./lights');
 
 
 exports.start = async (api) => {
+
+    const client = Jwks({ jwksUri: 'https://dev-jbom1tp8.eu.auth0.com/.well-known/jwks.json' });
+    const getKey = (header, callback) => {
+            
+        client.getSigningKey(header.kid, function(err, key) {
+
+            const signingKey = key.publicKey || key.rsaPublicKey;
+            callback(null, signingKey);
+        });
+    };
+
+    const jwtVerify = Util.promisify(Jwt.verify);
 
     const server = Hapi.server({
         port: process.env.PORT || 8000,
@@ -47,48 +61,16 @@ exports.start = async (api) => {
         method: 'GET',
         path: '/',
         options: { cors: true },
-        handler: (request, h) => {
-
-            Jwt.verify(request.query.token, process.env.JWT_SECRET);
-
-            return lightState;
-        }
-    });
-
-    server.route({
-        method: 'GET',
-        path: '/login',
-        options: { cors: true },
         handler: async (request, h) => {
 
-            // Exchange access code for access token
+            const token = request.headers.authorization.split(' ')[1];
+            const decoded = await jwtVerify(token, getKey);
 
-            const code = request.query.code;
-            const res = await Wreck.post(`https://github.com/login/oauth/access_token?client_id=${process.env.GH_CLIENT_ID}&client_secret=${process.env.GH_CLIENT_SECRET}&code=${code}`, {
-                headers: {
-                    accept: 'application/json'
-                },
-                json: true
-            });
-            
-            const { access_token } = res.payload;
-
-            // Find out who the user is
-
-            const { payload } = await Wreck.get('https://api.github.com/user', {
-                headers: {
-                    'User-Agent': 'Control Matt\'s Lights',
-                    authorization: `token ${access_token}`
-                },
-                json: true
-            });
-
-            if (process.env.ALLOWED_USERS.split(',').includes(payload.login)) {
-                const token = Jwt.sign({ user: payload.login }, process.env.JWT_SECRET);
-                return { token };
+            if (!decoded.permissions.includes('read:lights')) {
+                throw new Error('Need permissions to read lights');
             }
 
-            return {};
+            return lightState;
         }
     });
 
@@ -96,9 +78,14 @@ exports.start = async (api) => {
         method: 'PATCH',
         path: '/{id}',
         options: { cors: true },
-        handler: (request, h) => {
+        handler: async (request, h) => {
 
-            Jwt.verify(request.query.token, process.env.JWT_SECRET);
+            const token = request.headers.authorization.split(' ')[1];
+            const decoded = await jwtVerify(token, getKey);
+
+            if (!decoded.permissions.includes('update:lights')) {
+                throw new Error('Need permissions to update lights');
+            }
 
             const id = request.params.id;
             const { state } = request.payload;

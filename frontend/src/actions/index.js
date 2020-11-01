@@ -5,8 +5,10 @@ import Axios from 'axios';
 export const API_DATA_RECEIVED = 'API_DATA_RECEIVED';
 export const UPDATE_STATE = 'UPDATE_STATE';
 export const STATE_UPDATING = 'STATE_UPDATING';
+export const UPDATE_ACCESS_TOKEN = 'UPDATE_ACCESS_TOKEN';
 export const STATE_UPDATED = 'STATE_UPDATED';
 export const LOGGED_IN = 'LOGGED_IN';
+export const SET_USER = 'SET_USER';
 
 let API_URL = '/api';
 
@@ -18,13 +20,17 @@ if (document.location.href.includes('localhost') || document.location.href.inclu
 
 export const loadApiData = () => async (dispatch, getState) => {
 
-    const { updating } = getState();
+    const { updating, accessToken } = getState();
 
     if (updating) {
         return null;
     }
 
-    const req = Axios.get(`${API_URL}?token=${localStorage.token}`);
+    const req = Axios.get(`${API_URL}`, {
+        headers: {
+            authorization: `Bearer ${accessToken}`
+        }
+    });
     req.then((res) => {
 
         const { updating } = getState();
@@ -38,10 +44,16 @@ export const loadApiData = () => async (dispatch, getState) => {
 };
 
 
-export const updateState = (id, state) => async (dispatch) => {
+export const updateState = (id, state) => async (dispatch, getState) => {
+
+    const { accessToken } = getState();
 
     dispatch(stateUpdating(id, state));
-    await Axios.patch(`${API_URL}/${id}?token=${localStorage.token}`, { state });
+    await Axios.patch(`${API_URL}/${id}`, { state }, {
+        headers: {
+            authorization: `Bearer ${accessToken}`
+        }
+    });
     dispatch(stateUpdated());
 };
 
@@ -59,39 +71,19 @@ export const stateUpdating = (id, state) => ({
     payload: { id, state }
 });
 
+export const updateAccessToken = (token) => ({
+    type: UPDATE_ACCESS_TOKEN,
+    payload: { token }
+});
+
+export const updateUser = (user) => ({
+    type: SET_USER,
+    payload: { user }
+});
+
 export const loggedIn = () => async (dispatch) => {
 
     dispatch(loadApiData());
     setInterval(() => dispatch(loadApiData()), 4000);
     dispatch({ type: LOGGED_IN });
-};
-
-export const tryLogin = () => async (dispatch) => {
-
-    // Check if there's already a token
-
-    const token = localStorage.token;
-
-    if (token) {
-        dispatch(loggedIn());
-        return;
-    }
-
-    // Check if there's an auth code and try to login
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const auth_code = urlParams.get('code');
-
-    if(auth_code) {
-        // Get an application token
-
-        const res = await Axios.get(`${API_URL}/login?code=${auth_code}`);
-        if (res.data.token) {
-            localStorage.token = res.data.token;
-        }
-
-        // Reload to remove code from url
-
-        document.location.href = `${document.location.protocol}//${document.location.host}`;
-    }
 };

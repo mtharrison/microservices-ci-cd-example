@@ -1,54 +1,78 @@
 import '../styles/App.css';
 
+import { useAuth0 } from "@auth0/auth0-react";
 import { connect } from 'react-redux'
-import React from 'react'
+import { React, useEffect } from 'react'
 
+import { updateAccessToken, updateUser, loadApiData } from '../actions'
 import Room from './Room'
+import LoginButton from './LoginButton'
+import LogoutButton from './LogoutButton';
 
 
-let CLIENT_ID = '08f8eb34d09c1786e440';
+const App = ({ rooms, setAccessToken, user, setUser, load }) => {
 
-if (document.location.href.includes('localhost') || 
-    document.location.href.includes('192.168')) {
+    const { user: auth0User, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
+
+    useEffect(() => {
+
+        if (!isAuthenticated) {
+            return;
+        }
+
+        setUser(auth0User);
+
+        const getUserMetadata = async () => {
+
+            const accessToken = await getAccessTokenSilently({
+                audience: `http://control-matts-lights.com/api`,
+                scope: "read:lights",
+            });
         
-    CLIENT_ID = 'c6635e06cf02378a939f';
-}
+            setAccessToken(accessToken);
+            load();
+        };
+        
+        getUserMetadata();
 
-const LoggedIn = ({ rooms }) => (
-    <div className="App">
-        <h1>🏠💡 Control Matt's Lights 💡🏠</h1>
+    }, [getAccessTokenSilently, setAccessToken, isAuthenticated, auth0User, load, setUser]);
 
-        {Object.keys(rooms)
-            .sort((a, b) => rooms[b].lights.length - rooms[a].lights.length)
-            .map((roomId) => {
+    if (isLoading) {
+        return <p>Loading...</p>
+    }
 
-            const room = rooms[roomId];
-            return <Room key={roomId} room={room} />;
-        })}
-    </div>
-);
-
-const NotLoggedIn = () => {
-
-    const url = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}`;
-
-    return (
-        <div className="App">
-            <a href={url} id="github-button" className="btn btn-block btn-social btn-github">
-                <i className="fa fa-github"></i> Sign in with Github
-            </a>
-        </div>
-    );
-};
-
-const App = ({ rooms, loggedIn }) => {
+    if (!isAuthenticated) {
+        return (
+            <div className="App">
+                <header>
+                    <h1>🏠💡 Control Matt's Lights 💡🏠</h1> <div className="login-component"><LoginButton/></div>
+                </header> 
+            </div>
+        );
+    }
     
     return (
-        loggedIn ? <LoggedIn rooms={rooms} /> : <NotLoggedIn />
+        <div className="App">
+            <header>
+                <h1>🏠💡 Control Matt's Lights 💡🏠</h1> <div className="login-component">Logged in: {user && user.nickname} <LogoutButton/></div></header> 
+
+            {Object.keys(rooms)
+                .sort((a, b) => rooms[b].lights.length - rooms[a].lights.length)
+                .map((roomId) => {
+
+                const room = rooms[roomId];
+                return <Room key={roomId} room={room} />;
+            })}
+        </div>
     );
 }
         
 export default connect(
-    (state) => ({ rooms: state.rooms, loggedIn: state.loggedIn })
+    (state) => ({ rooms: state.rooms, user: state.user }),
+    (dispatch) => ({
+        setAccessToken: (token) => dispatch(updateAccessToken(token)),
+        setUser: (user) => dispatch(updateUser(user)),
+        load: () => dispatch(loadApiData())
+    })
 )(App);
             
