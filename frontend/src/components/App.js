@@ -4,13 +4,13 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { connect } from 'react-redux'
 import { React, useEffect } from 'react'
 
-import { updateAccessToken, updateUser, loadApiData } from '../actions'
+import { updateAccessToken, updateUser, loggedIn } from '../actions'
 import Room from './Room'
 import LoginButton from './LoginButton'
 import LogoutButton from './LogoutButton';
 
 
-const App = ({ rooms, setAccessToken, user, setUser, load }) => {
+const App = ({ rooms, setAccessToken, user, setUser, loginComplete }) => {
 
     const { user: auth0User, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
 
@@ -30,12 +30,12 @@ const App = ({ rooms, setAccessToken, user, setUser, load }) => {
             });
         
             setAccessToken(accessToken);
-            load();
+            loginComplete();
         };
         
         getUserMetadata();
 
-    }, [getAccessTokenSilently, setAccessToken, isAuthenticated, auth0User, load, setUser]);
+    }, [getAccessTokenSilently, setAccessToken, isAuthenticated, auth0User, loginComplete, setUser]);
 
     if (isLoading) {
         return <p>Loading...</p>
@@ -72,7 +72,7 @@ export default connect(
     (dispatch) => ({
         setAccessToken: (token) => dispatch(updateAccessToken(token)),
         setUser: (user) => dispatch(updateUser(user)),
-        load: () => dispatch(loadApiData())
+        loginComplete: () => dispatch(loggedIn())
     })
 )(App);
             
