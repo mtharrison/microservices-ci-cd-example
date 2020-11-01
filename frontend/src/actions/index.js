@@ -40,7 +40,7 @@ export const loadApiData = () => async (dispatch, getState) => {
 
 export const updateState = (id, state) => async (dispatch) => {
 
-    dispatch(stateUpdating());
+    dispatch(stateUpdating(id, state));
     await Axios.patch(`${API_URL}/${id}?token=${localStorage.token}`, { state });
     dispatch(stateUpdated());
 };
@@ -54,13 +54,15 @@ export const stateUpdated = (data) => ({
     type: STATE_UPDATED
 });
 
-export const stateUpdating = (data) => ({
-    type: STATE_UPDATING
+export const stateUpdating = (id, state) => ({
+    type: STATE_UPDATING,
+    payload: { id, state }
 });
 
 export const loggedIn = () => async (dispatch) => {
 
     dispatch(loadApiData());
+    setInterval(() => dispatch(loadApiData()), 4000);
     dispatch({ type: LOGGED_IN });
 };
 

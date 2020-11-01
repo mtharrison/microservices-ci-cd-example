@@ -1,6 +1,7 @@
 'use strict';
 
 const Hapi = require('@hapi/hapi');
+const Hoek = require('@hapi/hoek');
 const Jwt = require('jsonwebtoken');
 const Wreck = require('@hapi/wreck');
 
@@ -15,6 +16,33 @@ exports.start = async (api) => {
         routes: { cors: true }
     });
 
+    server.events.on('log', (event, tags) => {
+
+        console.log(tags, event);
+    });
+
+    server.events.on('request', (request, event, tags) => {
+
+        if (tags.error) {
+            console.error(event.error);
+            if (Hoek.reach(event.error, ['_hueError', 'payload'])) {
+                console.error(event.error._hueError.payload.error);
+            }
+        }
+    });
+
+
+    // Fetch light state every 3 seconds
+
+    let lightState;
+
+    setInterval(async () => {
+
+        lightState = await Lights.getLights(api);
+
+    }, 3000);
+
+
     server.route({
         method: 'GET',
         path: '/',
@@ -23,7 +51,7 @@ exports.start = async (api) => {
 
             Jwt.verify(request.query.token, process.env.JWT_SECRET);
 
-            return Lights.getLights(api);
+            return lightState;
         }
     });
 
